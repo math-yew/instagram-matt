@@ -1,0 +1,31 @@
+.red-text {
+	color:blue;
+}
+
+.no-pad{padding:0px;}
+
+.post-inner{padding-top: 0px;}
+
+.sol-from-left {
+  animation-name: from-left;
+  animation-duration: 4s;
+}
+
+.sol-hide {
+	opacity: 0;
+}
+
+.sol-from-right {
+  animation-name: from-right;
+  animation-duration: 4s;
+}
+
+@keyframes from-left {
+  from {opacity: 0;transform: translatex(-50%)}
+  to {opacity: 1;}
+}
+
+@keyframes from-right {
+  from {opacity: 0;transform: translatex(50%)}
+  to {opacity: 1;}
+}
