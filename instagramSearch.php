@@ -5,22 +5,28 @@ Description: Navigate some info in Instagram
 Author: Matt Mecham
 Version: 1.0
 */
-include 'simple_html_dom.php'; // If the library is in another folder you should do include 'path_to_library/simple_html_dom.php'
-include 'urls.php';
+//
+// $urls = array("https://www.instagram.com/p/CdMmh_upsB8/embed",
+// "https://www.instagram.com/p/CdNJ_BFBrj8/embed");
+
+
+
+
+
+
+// include 'simple_html_dom.php'; // If the library is in another folder you should do include 'path_to_library/simple_html_dom.php'
+require __DIR__ . '/urls.php';
 
 function sollus_styles() {
     wp_enqueue_style( 'sollus',  plugin_dir_url( __FILE__ ) . '/css/styles.css' );
 }
 add_action('wp_enqueue_scripts','sollus_styles');
 
-
 function theme_options_panel(){
-
   /*
 		Adding Menu to Main WordPress Side Menu
 		add_menu_page( string $page_title, string $menu_title, string $capability, string $menu_slug, callable $function = '', string $icon_url = '', int $position = null )
   */
-
   add_menu_page('Default Name', 'Default Name', 'manage_options', 'default-options', 'initialize_defaulplugin',plugins_url('/defaultname/img/icon.png',__DIR__));
 
   /*
@@ -61,26 +67,19 @@ function mattTest($atts, $content){
   }
 add_shortcode('matt-test', 'mattTest');
 
-
 function getData(){
   $servername = "localhost";
   $username = "root";
   $password = "";
   $dbname = "site1";
-
-  // Create connection
   $conn = new mysqli($servername, $username, $password, $dbname);
-  // Check connection
   if ($conn->connect_error) {
       die("Connection failed: " . $conn->connect_error);
   }
-
   $sql = "SELECT umeta_id, meta_key, meta_value FROM s1_usermeta";
   $result = $conn->query($sql);
-
   if ($result->num_rows > 0) {
       echo "<table  style='width:200px'><tr><th>ID</th><th>Name</th></tr>";
-      // output data of each row
       while($row = $result->fetch_assoc()) {
           echo "<tr><td style='width:100px'>" . $row["id"]. "</td><td style='width:100px'>" . $row["meta_key"]. " " . $row["meta_value"]. "</td></tr>";
       }
@@ -88,40 +87,30 @@ function getData(){
   } else {
       echo "0 results";
   }
-
   $conn->close();
-
 }
-// getData();
-?>
-  <button onclick="my_function()">Click Me</button>
-  <script>
-  function my_function() {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        alert(this.responseText);
-      }
-    };
-    request.open("GET", "./../../wp-content/plugins/instagram-matt/processURLs.php", true);
-    request.send();
-  }
-  </script>
-<?php
 
-function lookAtPage(){
 
+$matt = "mecham";
+function lookAtPage($urls){
+  echo $matt;
   foreach($urls as $u){
     getInfo($u);
   }
+  echo "<br>";
+  echo "Finished";
 }
 
-lookAtPage();
+lookAtPage($urls);
 
 function getInfo($url){
-  $html = file_get_contents($url);
+  $html = file_get_contents($url."embed");
   // echo '"'.substr($html,500,$len).'"';
   // $len = strlen($html);
+  echo "<br>";
+  echo "<br>";
+  echo "URL: ".$url;
+  echo "<br>";
 
   $userReg = "/UsernameText\">.*</";
   preg_match_all($userReg, $html, $userRes);
@@ -132,41 +121,62 @@ function getInfo($url){
 
   $followReg = "/\D\d(\d|[.,KM])+\s?followers/i";
   preg_match_all($followReg, $html, $followRes);
-  $follower = preg_replace("/[^KM.\d]/i","",$followRes[0][0]);
-  echo "# Followers: ".$follower;
+  $followers = preg_replace("/[^KM.\d]/i","",$followRes[0][0]);
+  echo "# Followers: ".$followers;
   echo "<br>";
+  if(preg_match("/K/", $followers)){
+    echo "true";
+    postData($userName,$followers,$url);
+  }
 }
 
-
-function postData(){
+function postData($name,$followers,$url){
   $servername = "localhost";
   $username = "root";
   $password = "";
   $dbname = "site1";
 
-  // Create connection
   $conn = new mysqli($servername, $username, $password, $dbname);
-  // Check connection
   if ($conn->connect_error) {
       die("Connection failed: " . $conn->connect_error);
   }
+  $sql = "INSERT INTO influencers (name, followers, url)
+  VALUES ('".$name."', '".$followers."', '".$url."')";
 
-  $sql = "SELECT umeta_id, meta_key, meta_value FROM influencers";
+  if ($conn->query($sql) === TRUE) {
+    echo "<br>";
+    echo "New record created successfully";
+  } else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+  }
+  echo "";
+  $conn->close();
+}
+
+function getDatabase(){
+  $servername = "localhost";
+  $username = "root";
+  $password = "";
+  $dbname = "site1";
+
+  $conn = new mysqli($servername, $username, $password, $dbname);
+  if ($conn->connect_error) {
+      die("Connection failed: " . $conn->connect_error);
+  }
+  $sql = "SELECT name, followers  FROM influencers";
   $result = $conn->query($sql);
 
   if ($result->num_rows > 0) {
       echo "<table  style='width:200px'><tr><th>ID</th><th>Name</th></tr>";
       // output data of each row
       while($row = $result->fetch_assoc()) {
-          echo "<tr><td style='width:100px'>" . $row["id"]. "</td><td style='width:100px'>" . $row["meta_key"]. " " . $row["meta_value"]. "</td></tr>";
+          echo "<tr><td style='width:100px'>" . $row["name"]. "</td><td style='width:100px'>" . $row["followers"]. "</td></tr>";
       }
       echo "</table>";
   } else {
       echo "0 results";
   }
-
   $conn->close();
-
 }
 
 ?>

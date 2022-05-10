@@ -1,0 +1,1 @@
+SELECT MIN(id) AS id, name FROM `influencers` GROUP BY name;
