@@ -16,6 +16,7 @@ Version: 1.0
 
 // include 'simple_html_dom.php'; // If the library is in another folder you should do include 'path_to_library/simple_html_dom.php'
 require __DIR__ . '/urls.php';
+require __DIR__ . '/scores.php';
 
 function sollus_styles() {
     wp_enqueue_style( 'sollus',  plugin_dir_url( __FILE__ ) . '/css/styles.css' );
@@ -91,17 +92,30 @@ function getData(){
 }
 
 
-$matt = "mecham";
 function lookAtPage($urls){
-  echo $matt;
   foreach($urls as $u){
     getInfo($u);
   }
   echo "<br>";
-  echo "Finished";
+  echo "Finished URLS";
 }
-
 lookAtPage($urls);
+
+function recordScores($scores){
+  while (current($scores)) {
+
+    echo "<br>";
+    echo current($scores);
+    echo "<br>";
+    if(current($scores)!=null){
+      recordScore(key($scores),current($scores));
+    }
+    next($scores);
+  }
+  echo "<br>";
+  echo "Finished scores";
+}
+recordScores($scores);
 
 function getInfo($url){
   $html = file_get_contents($url."embed");
@@ -146,6 +160,31 @@ function postData($name,$followers,$url){
   if ($conn->query($sql) === TRUE) {
     echo "<br>";
     echo "New record created successfully";
+  } else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+  }
+  echo "";
+  $conn->close();
+}
+
+function recordScore($sName,$sScore){
+  $servername = "localhost";
+  $username = "root";
+  $password = "";
+  $dbname = "site1";
+
+  $conn = new mysqli($servername, $username, $password, $dbname);
+  if ($conn->connect_error) {
+      die("Connection failed: " . $conn->connect_error);
+  }
+  echo $sScore;
+  echo $sName;
+
+  $sql = "UPDATE influencers SET score='".$sScore."' WHERE name='".$sName."'";
+
+  if ($conn->query($sql) === TRUE) {
+    echo "<br>";
+    echo "New score recorded successfully";
   } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
   }

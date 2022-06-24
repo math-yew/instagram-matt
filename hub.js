@@ -1,9 +1,23 @@
 let influencerArr = [
-  'paulinarygiert',
+  'tellitto_lala',
 
-'pozytywny_domek',
+'laury_deco',
 
-'jamie_banfield_design'
+'journeytoforeverhome',
+
+'tresjolie.feline',
+
+'ania_home_ie',
+
+'eleonora_risciglione',
+
+'hechoconalmayamor',
+
+'harumirai31',
+
+'shabby.ie',
+
+'mieszkanie.marzen'
 ];
 
 let list = [];
